@@ -1,0 +1,13 @@
+# Build outputs
+**/bin/
+**/obj/
+
+# Local tooling cache/temp
+.dotnet_home/
+.staging/
+.codex/
+
+# OS/editor junk
+*.log
+.DS_Store
+Thumbs.db

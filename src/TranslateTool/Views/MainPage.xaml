@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Page
+    x:Class="TranslateTool.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Grid x:Name="PageRoot">
+        <Border x:Name="ContentOverlay" Background="#66FFFFFF" />
+
+        <Grid Padding="16" RowSpacing="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    FontSize="22"
+                    FontWeight="SemiBold"
+                    Text="TranslateTool" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <Button Content="文字翻译" Click="OnGoTextTabClicked" />
+                    <Button Content="图片/截图翻译" Click="OnGoImageTabClicked" />
+                </StackPanel>
+            </Grid>
+
+            <TabView
+                x:Name="MainTabView"
+                Grid.Row="1"
+                SizeChanged="OnMainTabViewSizeChanged">
+                <TabViewItem Header="翻译">
+                    <Grid RowSpacing="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ComboBox x:Name="SourceLanguageCombo" Grid.Column="0" MinWidth="150" />
+                            <Button x:Name="SwapTextButton" Grid.Column="1" Content="互换" Click="OnSwapTextLanguagesClicked" />
+                            <ComboBox x:Name="TargetLanguageCombo" Grid.Column="2" MinWidth="150" />
+                        </Grid>
+
+                        <TextBox
+                            x:Name="SourceTextBox"
+                            Grid.Row="1"
+                            AcceptsReturn="True"
+                            KeyDown="OnSourceTextBoxKeyDown"
+                            PlaceholderText="输入要翻译的文本，Enter 快速翻译，Shift+Enter 换行"
+                            TextWrapping="Wrap" />
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
+                            <Button Content="翻译文本" Click="OnTranslateClicked" />
+                        </StackPanel>
+
+                        <TextBox
+                            x:Name="ResultTextBox"
+                            Grid.Row="3"
+                            AcceptsReturn="True"
+                            IsReadOnly="True"
+                            PlaceholderText="翻译结果"
+                            TextWrapping="Wrap" />
+                    </Grid>
+                </TabViewItem>
+
+                <TabViewItem Header="图片与截图翻译">
+                    <Grid
+                        x:Name="ImageTranslateLayoutGrid"
+                        Padding="2"
+                        ColumnSpacing="12"
+                        RowSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="ImageLayoutColumnLeft" Width="1.2*" />
+                            <ColumnDefinition x:Name="ImageLayoutColumnRight" Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition x:Name="ImageLayoutRowTop" Height="*" />
+                            <RowDefinition x:Name="ImageLayoutRowBottom" Height="0" />
+                        </Grid.RowDefinitions>
+
+                        <Border
+                            x:Name="ImagePreviewPanel"
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Padding="10"
+                            Background="#F7FFFFFF"
+                            BorderBrush="#22000000"
+                            BorderThickness="1"
+                            CornerRadius="10">
+                            <StackPanel Spacing="8">
+                                <TextBlock FontSize="17" FontWeight="SemiBold" Text="图片预览" />
+                                <Border
+                                    MinHeight="320"
+                                    Background="#FFFFFFFF"
+                                    BorderBrush="#22000000"
+                                    BorderThickness="1"
+                                    CornerRadius="8">
+                                    <Image x:Name="ImagePreview" Stretch="Uniform" />
+                                </Border>
+                                <TextBlock x:Name="SelectedImagePathText" Opacity="0.75" Text="未选择图片" TextTrimming="CharacterEllipsis" />
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Button Content="上传图片" Click="OnSelectImageClicked" />
+                                    <Button Content="截图翻译 (Ctrl+Shift+A)" Click="OnCaptureFromImagePageClicked" />
+                                    <Button Content="清除" Click="OnClearImageClicked" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border
+                            x:Name="ImageResultPanel"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Padding="10"
+                            Background="#F7FFFFFF"
+                            BorderBrush="#22000000"
+                            BorderThickness="1"
+                            CornerRadius="10">
+                            <Grid RowSpacing="8">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" FontSize="17" FontWeight="SemiBold" Text="OCR + 翻译" />
+
+                                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                                    <ComboBox x:Name="SourceLanguageImageCombo" MinWidth="120" />
+                                    <Button Content="互换" Click="OnSwapImageLanguagesClicked" />
+                                    <ComboBox x:Name="TargetLanguageImageCombo" MinWidth="120" />
+                                    <Button Content="识别并翻译" Click="OnImageTranslateClicked" />
+                                </StackPanel>
+
+                                <Grid Grid.Row="2" RowSpacing="6">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock FontWeight="SemiBold" Text="OCR 文本" />
+                                    <TextBox x:Name="ImageOcrTextBox" Grid.Row="1" AcceptsReturn="True" IsReadOnly="True" TextWrapping="Wrap" />
+                                </Grid>
+
+                                <Grid Grid.Row="3" RowSpacing="6">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock FontWeight="SemiBold" Text="翻译结果" />
+                                    <TextBox x:Name="ImageResultTextBox" Grid.Row="1" AcceptsReturn="True" IsReadOnly="True" TextWrapping="Wrap" />
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </TabViewItem>
+
+                <TabViewItem Header="历史">
+                    <Grid RowSpacing="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
+                            <Button Content="刷新" Click="OnRefreshHistoryClicked" />
+                            <Button Content="复制选中" Click="OnCopySelectedHistoryClicked" />
+                            <Button Content="清空" Click="OnClearHistoryClicked" />
+                        </StackPanel>
+
+                        <ListView
+                            x:Name="HistoryListView"
+                            Grid.Row="1"
+                            IsMultiSelectCheckBoxEnabled="True"
+                            SelectionMode="Multiple">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Margin="0,0,0,8"
+                                        Padding="10"
+                                        Background="#F7FFFFFF"
+                                        BorderBrush="#22000000"
+                                        BorderThickness="1"
+                                        CornerRadius="8">
+                                        <StackPanel Spacing="5">
+                                            <TextBlock IsTextSelectionEnabled="True" Opacity="0.75" Text="{Binding CreatedAt}" />
+                                            <TextBlock IsTextSelectionEnabled="True" FontWeight="SemiBold" Text="{Binding Provider}" />
+                                            <TextBlock IsTextSelectionEnabled="True" Text="{Binding Source}" TextWrapping="Wrap" />
+                                            <TextBlock IsTextSelectionEnabled="True" Text="↓" />
+                                            <TextBlock IsTextSelectionEnabled="True" Text="{Binding Result}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </TabViewItem>
+
+                <TabViewItem Header="设置">
+                    <ScrollViewer>
+                        <StackPanel Spacing="10">
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Text="设置" />
+
+                            <TextBlock FontWeight="SemiBold" Text="全局字号" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Slider
+                                    x:Name="UiFontSizeSlider"
+                                    Width="220"
+                                    ValueChanged="OnUiFontSizeSliderValueChanged" />
+                                <TextBlock x:Name="UiFontSizeValueText" VerticalAlignment="Center" Text="14" />
+                            </StackPanel>
+
+                            <TextBlock FontWeight="SemiBold" Text="背景风格" />
+                            <ComboBox x:Name="BackgroundStyleCombo">
+                                <ComboBoxItem Content="渐变" />
+                                <ComboBoxItem Content="磨砂浅色" />
+                                <ComboBoxItem Content="插画风" />
+                                <ComboBoxItem Content="自定义图片" />
+                            </ComboBox>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Content="上传背景图片" Click="OnPickBackgroundImageClicked" />
+                                <TextBlock x:Name="BackgroundImagePathText" Opacity="0.75" VerticalAlignment="Center" Text="未设置自定义背景" />
+                            </StackPanel>
+
+                            <TextBox x:Name="HotkeyTextBox" Header="全局截图快捷键" PlaceholderText="Ctrl+Shift+A" />
+                            <ToggleSwitch x:Name="HidePopupToggle" Header="截图前隐藏当前窗口" IsOn="True" />
+
+                            <TextBlock FontWeight="SemiBold" Text="百度翻译" />
+                            <TextBox x:Name="BaiduAppIdTextBox" Header="AppId" />
+                            <PasswordBox x:Name="BaiduKeyTextBox" Header="Key" />
+
+                            <TextBlock FontWeight="SemiBold" Text="百度 OCR" />
+                            <TextBox x:Name="BaiduOcrApiKeyTextBox" Header="API Key" />
+                            <PasswordBox x:Name="BaiduOcrSecretKeyTextBox" Header="Secret Key" />
+
+                            <Button HorizontalAlignment="Left" Content="保存设置" Click="OnSaveSettingsClicked" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabViewItem>
+            </TabView>
+
+            <InfoBar
+                x:Name="StatusInfoBar"
+                Grid.Row="1"
+                VerticalAlignment="Bottom"
+                Margin="0,0,0,8"
+                IsClosable="True"
+                IsOpen="False"
+                Severity="Informational" />
+        </Grid>
+    </Grid>
+</Page>
