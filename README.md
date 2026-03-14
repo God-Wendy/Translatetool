@@ -15,10 +15,14 @@ dotnet build .\src\TranslateTool\TranslateTool.csproj --configfile .\NuGet.Confi
 dotnet run --project .\src\TranslateTool\TranslateTool.csproj --configfile .\NuGet.Config
 ```
 
-## 打包（每版本目录只保留一个 zip）
+## 打包（版本目录保留可启动 exe + zip）
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\package.ps1 -Version v1.0 -Configuration Release -Runtime win-x64
 ```
 
 产物：
+- `versions/v1.0/TranslateTool.exe`
 - `versions/v1.0/TranslateTool-v1.0-win-x64.zip`
+
+## 归档标记
+- 2026-03-14：创建 `codex/v1.0-archive` 分支并用于发起 PR。
